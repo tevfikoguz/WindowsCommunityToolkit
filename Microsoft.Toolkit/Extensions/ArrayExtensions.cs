@@ -4,9 +4,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 #if NETSTANDARD2_1
-using System.Drawing;
 using System.Runtime.InteropServices;
 #endif
 
@@ -30,33 +30,25 @@ namespace Microsoft.Toolkit.Extensions
         /// <param name="height">Positive height of area to fill.</param>
         public static void Fill<T>(this T[,] array, T value, int row, int col, int width, int height)
         {
-#if NETSTANDARD2_1
             Rectangle bounds = new Rectangle(0, 0, array.GetLength(1), array.GetLength(0));
 
+            // Precompute bounds to skip branching in main loop
             bounds.Intersect(new Rectangle(col, row, width, height));
 
             for (int i = bounds.Top; i < bounds.Bottom; i++)
             {
+#if NETSTANDARD2_1
                 ref T r0 = ref array[i, bounds.Left];
 
-                /* Calculating the target bounds in advance allows us to
-                 * skip the branching instructions in the main loop.
-                 * Additionally, the Span<T>.Fill API will use a fast
-                 * path with vectorized instructions whenever possible. */
+                // Span<T>.Fill will use vectorized instructions when possible
                 MemoryMarshal.CreateSpan(ref r0, bounds.Width).Fill(value);
-            }
 #else
-            for (int r = row; r < row + height; r++)
-            {
-                for (int c = col; c < col + width; c++)
+                for (int j = bounds.Left; j < bounds.Right; j++)
                 {
-                    if (r >= 0 && c >= 0 && r < array.GetLength(0) && c < array.GetLength(1))
-                    {
-                        array[r, c] = value;
-                    }
+                    array[i, j] = value;
                 }
-            }
 #endif
+            }
         }
 
         /// <summary>
