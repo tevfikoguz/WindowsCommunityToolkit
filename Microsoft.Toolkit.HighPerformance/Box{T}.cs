@@ -139,6 +139,7 @@ namespace Microsoft.Toolkit.HighPerformance
         }
 
         /// <inheritdoc/>
+        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009", Justification = "Nullability warning suppression operator")]
         public override string ToString()
         {
             /* Here we're overriding the base object virtual methods to ensure
@@ -152,11 +153,11 @@ namespace Microsoft.Toolkit.HighPerformance
              * an object reference is used instead, the call would be forwarded
              * to those same methods anyway, since the method table for an object
              * representing a T instance is the one of type T anyway. */
-            return this.GetReference().ToString();
+            return this.GetReference().ToString()!;
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(this, obj);
         }
