@@ -24,5 +24,45 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
         {
             return Unsafe.As<bool, byte>(ref flag);
         }
+
+        /// <summary>
+        /// Converts the given <see cref="bool"/> value to an <see cref="int"/> mask with
+        /// all bits representing the value of the input flag (either 0xFFFFFFFF or 0x00000000).
+        /// </summary>
+        /// <param name="flag">The input value to convert.</param>
+        /// <returns>0xFFFFFFFF if <paramref name="flag"/> is <see langword="true"/>, 0x00000000 otherwise.</returns>
+        /// <remarks>This method does not contain branching instructions.</remarks>
+        [Pure]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int ToBitwiseMask32(this bool flag)
+        {
+            bool localFlag = flag;
+            byte rangeFlag = Unsafe.As<bool, byte>(ref localFlag);
+            int
+                negativeFlag = rangeFlag - 1,
+                mask = ~negativeFlag;
+
+            return mask;
+        }
+
+        /// <summary>
+        /// Converts the given <see cref="bool"/> value to a <see cref="long"/> mask with
+        /// all bits representing the value of the input flag (either all 1s or 0s).
+        /// </summary>
+        /// <param name="flag">The input value to convert.</param>
+        /// <returns>All 1s if <paramref name="flag"/> is <see langword="true"/>, all 0s otherwise.</returns>
+        /// <remarks>This method does not contain branching instructions.</remarks>
+        [Pure]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static long ToBitwiseMask64(this bool flag)
+        {
+            bool localFlag = flag;
+            byte rangeFlag = Unsafe.As<bool, byte>(ref localFlag);
+            long
+                negativeFlag = (long)rangeFlag - 1,
+                mask = ~negativeFlag;
+
+            return mask;
+        }
     }
 }
