@@ -24,7 +24,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
         {
             Span<byte> span = writer.GetSpan(1);
 
-            MemoryMarshal.GetReference(span) = value;
+            span[0] = value;
 
             writer.Advance(1);
         }
@@ -42,11 +42,25 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
             int length = Unsafe.SizeOf<T>();
             Span<byte> span = writer.GetSpan(length);
 
-            ref byte r0 = ref MemoryMarshal.GetReference(span);
-
-            Unsafe.As<byte, T>(ref r0) = value;
+            MemoryMarshal.Write(span, ref Unsafe.AsRef(value));
 
             writer.Advance(length);
+        }
+
+        /// <summary>
+        /// Writes a value of a specified type into a target <see cref="IBufferWriter{T}"/> instance.
+        /// </summary>
+        /// <typeparam name="T">The type of value to write.</typeparam>
+        /// <param name="writer">The target <see cref="IBufferWriter{T}"/> instance to write to.</param>
+        /// <param name="value">The input value to write to <paramref name="writer"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Write<T>(this IBufferWriter<T> writer, T value)
+        {
+            Span<T> span = writer.GetSpan(1);
+
+            span[0] = value;
+
+            writer.Advance(1);
         }
 
         /// <summary>
@@ -80,6 +94,23 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
             source.CopyTo(destination);
 
             writer.Advance(source.Length);
+        }
+
+        /// <summary>
+        /// Writes a series of items of a specified type into a target <see cref="IBufferWriter{T}"/> instance.
+        /// </summary>
+        /// <typeparam name="T">The type of value to write.</typeparam>
+        /// <param name="writer">The target <see cref="IBufferWriter{T}"/> instance to write to.</param>
+        /// <param name="span">The input <see cref="ReadOnlySpan{T}"/> to write to <paramref name="writer"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Write<T>(this IBufferWriter<T> writer, ReadOnlySpan<T> span)
+            where T : unmanaged
+        {
+            Span<T> destination = writer.GetSpan(span.Length);
+
+            span.CopyTo(destination);
+
+            writer.Advance(span.Length);
         }
     }
 }
