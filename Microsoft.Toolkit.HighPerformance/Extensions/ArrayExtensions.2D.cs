@@ -3,10 +3,13 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+#if NETCORE_RUNTIME || NETSTANDARD2_1_OR_GREATER
 using System.Runtime.InteropServices;
+#endif
 using Microsoft.Toolkit.HighPerformance.Enumerables;
 
 #nullable enable
@@ -27,12 +30,25 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
         /// <remarks>This method doesn't do any bounds checks, therefore it is responsibility of the caller to perform checks in case the returned value is dereferenced.</remarks>
         [Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1131", Justification = "JIT bounds check elimination")]
         public static ref T DangerousGetReference<T>(this T[,] array)
         {
+#if NETCORE_RUNTIME
             var arrayData = Unsafe.As<RawArray2DData>(array);
             ref T r0 = ref Unsafe.As<byte, T>(ref arrayData.Data);
 
             return ref r0;
+#else
+            if (0u < (uint)array.Length)
+            {
+                return ref array[0, 0];
+            }
+
+            unsafe
+            {
+                return ref Unsafe.AsRef<T>(null);
+            }
+#endif
         }
 
         /// <summary>
@@ -53,14 +69,28 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T DangerousGetReferenceAt<T>(this T[,] array, int i, int j)
         {
+#if NETCORE_RUNTIME
             var arrayData = Unsafe.As<RawArray2DData>(array);
             int offset = (i * arrayData.Width) + j;
             ref T r0 = ref Unsafe.As<byte, T>(ref arrayData.Data);
             ref T ri = ref Unsafe.Add(ref r0, offset);
 
             return ref ri;
+#else
+            if ((uint)i < (uint)array.GetLength(0) &&
+                (uint)j < (uint)array.GetLength(1))
+            {
+                return ref array[i, j];
+            }
+
+            unsafe
+            {
+                return ref Unsafe.AsRef<T>(null);
+            }
+#endif
         }
 
+#if NETCORE_RUNTIME
         // Description adapted from CoreCLR: see https://source.dot.net/#System.Private.CoreLib/src/System/Runtime/CompilerServices/RuntimeHelpers.CoreCLR.cs,285.
         // CLR 2D arrays are laid out in memory as follows:
         // [ sync block || pMethodTable || Length (padded to IntPtr) || HxW || HxW bounds || array data .. ]
@@ -83,6 +113,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
 #pragma warning restore CS0649
 #pragma warning restore SA1401
         }
+#endif
 
         /// <summary>
         /// Fills an area in a given 2D <typeparamref name="T"/> array instance with a specified value.
@@ -105,13 +136,17 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
 
             for (int i = bounds.Top; i < bounds.Bottom; i++)
             {
-#if NETSTANDARD2_1
+#if SPAN_RUNTIME_SUPPORT
+#if NETCORE_RUNTIME
+                ref T r0 = ref array.DangerousGetReferenceAt(i, bounds.Left);
+#else
                 ref T r0 = ref array[i, bounds.Left];
+#endif
 
                 // Span<T>.Fill will use vectorized instructions when possible
                 MemoryMarshal.CreateSpan(ref r0, bounds.Width).Fill(value);
 #else
-                ref T r0 = ref array.DangerousGetReferenceAt(i, bounds.Left);
+                ref T r0 = ref array[i, bounds.Left];
 
                 for (int j = 0; j < bounds.Width; j++)
                 {
@@ -209,6 +244,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<T> AsSpan<T>(this T[,] array)
         {
+#if NETCORE_RUNTIME
             var arrayData = Unsafe.As<RawArray2DData>(array);
 
             /* On x64, the length is padded to x64, but it is represented in memory
@@ -222,7 +258,10 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
              * invalid value here should fail to perform the cast and throw an exception. */
             int length = checked((int)Unsafe.As<IntPtr, uint>(ref arrayData.Length));
             ref T r0 = ref Unsafe.As<byte, T>(ref arrayData.Data);
-
+#else
+            int length = array.Length;
+            ref T r0 = ref array[0, 0];
+#endif
             return MemoryMarshal.CreateSpan(ref r0, length);
         }
 
@@ -256,5 +295,5 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
             return ReadOnlySpanExtensions.GetDjb2HashCode<T>(array.AsSpan());
         }
 #endif
-    }
+        }
 }
