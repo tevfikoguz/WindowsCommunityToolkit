@@ -27,6 +27,7 @@
   <ItemGroup Condition=" $(TargetFramework) == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.0" />
     <PackageReference Include="System.Memory" Version="4.5.4" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
 
   <!-- Define a .NET Standard 2.1 equivalent that includes both .NET Standard 2.1 and .NET Core 3.1.
