@@ -7,12 +7,14 @@ using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
+#nullable enable
+
 namespace Microsoft.Toolkit.Uwp.UI.Extensions
 {
     /// <summary>
     /// Defines a collection of extensions methods for UI.
     /// </summary>
-    public static class VisualTree
+    public static partial class VisualTree
     {
         /// <summary>
         /// Find descendant <see cref="FrameworkElement"/> control using its name.
@@ -20,29 +22,13 @@ namespace Microsoft.Toolkit.Uwp.UI.Extensions
         /// <param name="element">Parent element.</param>
         /// <param name="name">Name of the control to find</param>
         /// <returns>Descendant control or null if not found.</returns>
-        public static FrameworkElement FindDescendantByName(this DependencyObject element, string name)
+        public static FrameworkElement? FindDescendantByName(this DependencyObject element, string name)
         {
-            if (element == null || string.IsNullOrWhiteSpace(name))
-            {
-                return null;
-            }
+            var matcher = new NameMatcher(name);
 
-            if (name.Equals((element as FrameworkElement)?.Name, StringComparison.OrdinalIgnoreCase))
-            {
-                return element as FrameworkElement;
-            }
+            TryFindDescendant(element, ref matcher, out DependencyObject? result);
 
-            var childCount = VisualTreeHelper.GetChildrenCount(element);
-            for (int i = 0; i < childCount; i++)
-            {
-                var result = VisualTreeHelper.GetChild(element, i).FindDescendantByName(name);
-                if (result != null)
-                {
-                    return result;
-                }
-            }
-
-            return null;
+            return (FrameworkElement?)result;
         }
 
         /// <summary>
@@ -51,31 +37,14 @@ namespace Microsoft.Toolkit.Uwp.UI.Extensions
         /// <typeparam name="T">Type to search for.</typeparam>
         /// <param name="element">Parent element.</param>
         /// <returns>Descendant control or null if not found.</returns>
-        public static T FindDescendant<T>(this DependencyObject element)
+        public static T? FindDescendant<T>(this DependencyObject element)
             where T : DependencyObject
         {
-            T retValue = null;
-            var childrenCount = VisualTreeHelper.GetChildrenCount(element);
+            var matcher = default(TypeMatcher<T>);
 
-            for (var i = 0; i < childrenCount; i++)
-            {
-                var child = VisualTreeHelper.GetChild(element, i);
-                var type = child as T;
-                if (type != null)
-                {
-                    retValue = type;
-                    break;
-                }
+            TryFindDescendant(element, ref matcher, out T? result);
 
-                retValue = FindDescendant<T>(child);
-
-                if (retValue != null)
-                {
-                    break;
-                }
-            }
-
-            return retValue;
+            return result;
         }
 
         /// <summary>
@@ -84,29 +53,13 @@ namespace Microsoft.Toolkit.Uwp.UI.Extensions
         /// <param name="element">Parent element.</param>
         /// <param name="type">Type of descendant.</param>
         /// <returns>Descendant control or null if not found.</returns>
-        public static object FindDescendant(this DependencyObject element, Type type)
+        public static DependencyObject? FindDescendant(this DependencyObject element, Type type)
         {
-            object retValue = null;
-            var childrenCount = VisualTreeHelper.GetChildrenCount(element);
+            var matcher = new TypeMatcher(type);
 
-            for (var i = 0; i < childrenCount; i++)
-            {
-                var child = VisualTreeHelper.GetChild(element, i);
-                if (child.GetType() == type)
-                {
-                    retValue = child;
-                    break;
-                }
+            TryFindDescendant(element, ref matcher, out DependencyObject? result);
 
-                retValue = FindDescendant(child, type);
-
-                if (retValue != null)
-                {
-                    break;
-                }
-            }
-
-            return retValue;
+            return result;
         }
 
         /// <summary>
@@ -142,26 +95,13 @@ namespace Microsoft.Toolkit.Uwp.UI.Extensions
         /// <param name="element">Parent element.</param>
         /// <param name="name">Name of the control to find</param>
         /// <returns>Descendant control or null if not found.</returns>
-        public static FrameworkElement FindAscendantByName(this DependencyObject element, string name)
+        public static FrameworkElement? FindAscendantByName(this DependencyObject element, string name)
         {
-            if (element == null || string.IsNullOrWhiteSpace(name))
-            {
-                return null;
-            }
+            var matcher = new NameMatcher(name);
 
-            var parent = VisualTreeHelper.GetParent(element);
+            TryFindAscendant(element, ref matcher, out DependencyObject? result);
 
-            if (parent == null)
-            {
-                return null;
-            }
-
-            if (name.Equals((parent as FrameworkElement)?.Name, StringComparison.OrdinalIgnoreCase))
-            {
-                return parent as FrameworkElement;
-            }
-
-            return parent.FindAscendantByName(name);
+            return (FrameworkElement?)result;
         }
 
         /// <summary>
@@ -170,22 +110,14 @@ namespace Microsoft.Toolkit.Uwp.UI.Extensions
         /// <typeparam name="T">Type to search for.</typeparam>
         /// <param name="element">Child element.</param>
         /// <returns>Ascendant control or null if not found.</returns>
-        public static T FindAscendant<T>(this DependencyObject element)
+        public static T? FindAscendant<T>(this DependencyObject element)
             where T : DependencyObject
         {
-            var parent = VisualTreeHelper.GetParent(element);
+            var matcher = default(TypeMatcher<T>);
 
-            if (parent == null)
-            {
-                return null;
-            }
+            TryFindAscendant(element, ref matcher, out T? result);
 
-            if (parent is T)
-            {
-                return parent as T;
-            }
-
-            return parent.FindAscendant<T>();
+            return result;
         }
 
         /// <summary>
@@ -194,21 +126,13 @@ namespace Microsoft.Toolkit.Uwp.UI.Extensions
         /// <param name="element">Child element.</param>
         /// <param name="type">Type of ascendant to look for.</param>
         /// <returns>Ascendant control or null if not found.</returns>
-        public static object FindAscendant(this DependencyObject element, Type type)
+        public static DependencyObject? FindAscendant(this DependencyObject element, Type type)
         {
-            var parent = VisualTreeHelper.GetParent(element);
+            var matcher = new TypeMatcher(type);
 
-            if (parent == null)
-            {
-                return null;
-            }
+            TryFindDescendant(element, ref matcher, out DependencyObject? result);
 
-            if (parent.GetType() == type)
-            {
-                return parent;
-            }
-
-            return parent.FindAscendant(type);
+            return result;
         }
 
         /// <summary>
