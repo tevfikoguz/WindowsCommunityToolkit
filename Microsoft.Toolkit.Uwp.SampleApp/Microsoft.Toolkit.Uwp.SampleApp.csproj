@@ -115,7 +115,7 @@
       <Version>6.1.0-build.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.3.200213001</Version>
+      <Version>2.4.2</Version>
     </PackageReference>
     <PackageReference Include="Monaco.Editor">
       <Version>0.7.0-alpha</Version>
@@ -130,7 +130,7 @@
       <Version>1.0.5</Version>
     </PackageReference>
     <PackageReference Include="System.ValueTuple">
-      <Version>4.4.0</Version>
+      <Version>4.5.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -605,6 +605,7 @@
     <Content Include="SamplePages\IconExtensions\IconExtensionsXaml.bind" />
     <Content Include="SamplePages\WrapLayout\WrapLayout.bind" />
     <Content Include="SamplePages\ObservableGroup\ObservableGroup.bind" />
+    <Content Include="SamplePages\ScrollViewerExtensions\ScrollViewerExtensionsXaml.bind" />
     <Content Include="SamplePages\Triggers\CompareStateTrigger.bind" />
     <Content Include="SamplePages\Triggers\IsEqualStateTrigger.bind" />
     <Content Include="SamplePages\Triggers\FullScreenModeStateTrigger.bind" />
@@ -614,6 +615,7 @@
     <Content Include="SamplePages\Triggers\RegexStateTrigger.bind" />
     <Content Include="SamplePages\Triggers\UserHandPreferenceStateTrigger.bind" />
     <Content Include="SamplePages\Triggers\UserInteractionModeStateTrigger.bind" />
+    <Content Include="SamplePages\StaggeredLayout\StaggeredLayout.bind" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
