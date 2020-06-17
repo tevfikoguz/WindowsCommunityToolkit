@@ -259,6 +259,12 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
             ref T r0 = ref Unsafe.As<byte, T>(ref arrayData.Data);
 #else
             int length = array.Length;
+
+            if (length == 0)
+            {
+                return default;
+            }
+
             ref T r0 = ref array[0, 0];
 #endif
             return MemoryMarshal.CreateSpan(ref r0, length);
