@@ -62,7 +62,7 @@ namespace UnitTests.HighPerformance.Extensions
         {
             var value = new Int(37438941);
 
-            foreach (var count in TestCounts)
+            foreach (var count in TestCounts.Slice(0, TestCounts.Length - 1))
             {
                 var random = new Random(count);
 
