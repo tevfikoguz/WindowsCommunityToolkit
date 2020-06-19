@@ -178,7 +178,9 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
 
             if ((uint)row >= (uint)height)
             {
-                throw new ArgumentOutOfRangeException(nameof(row));
+                static void Throw() => throw new ArgumentOutOfRangeException(nameof(row));
+
+                Throw();
             }
 
             int width = array.GetLength(1);
@@ -227,7 +229,9 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
 
             if ((uint)column >= (uint)width)
             {
-                throw new ArgumentOutOfRangeException(nameof(column));
+                static void Throw() => throw new ArgumentOutOfRangeException(nameof(column));
+
+                Throw();
             }
 
             int height = array.GetLength(0);
@@ -333,7 +337,9 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
         {
             if ((uint)row >= (uint)array.GetLength(0))
             {
-                throw new ArgumentOutOfRangeException(nameof(row));
+                static void Throw() => throw new ArgumentOutOfRangeException(nameof(row));
+
+                Throw();
             }
 
             ref T r0 = ref array.DangerousGetReferenceAt(row, 0);
