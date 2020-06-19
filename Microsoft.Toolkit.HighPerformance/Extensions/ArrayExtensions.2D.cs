@@ -30,7 +30,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T DangerousGetReference<T>(this T[,] array)
         {
-#if NETCORE_RUNTIME || NETCOREAPP5_0
+#if NETCORE_RUNTIME
             var arrayData = Unsafe.As<RawArray2DData>(array);
             ref T r0 = ref Unsafe.As<byte, T>(ref arrayData.Data);
 
@@ -68,7 +68,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T DangerousGetReferenceAt<T>(this T[,] array, int i, int j)
         {
-#if NETCORE_RUNTIME || NETCOREAPP5_0
+#if NETCORE_RUNTIME
             var arrayData = Unsafe.As<RawArray2DData>(array);
             int offset = (i * arrayData.Width) + j;
             ref T r0 = ref Unsafe.As<byte, T>(ref arrayData.Data);
@@ -89,7 +89,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
 #endif
         }
 
-#if NETCORE_RUNTIME || NETCOREAPP5_0
+#if NETCORE_RUNTIME
         // Description adapted from CoreCLR: see https://source.dot.net/#System.Private.CoreLib/src/System/Runtime/CompilerServices/RuntimeHelpers.CoreCLR.cs,285.
         // CLR 2D arrays are laid out in memory as follows:
         // [ sync block || pMethodTable || Length (padded to IntPtr) || HxW || HxW bounds || array data .. ]
@@ -136,7 +136,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
             for (int i = bounds.Top; i < bounds.Bottom; i++)
             {
 #if SPAN_RUNTIME_SUPPORT
-#if NETCORE_RUNTIME || NETCOREAPP5_0
+#if NETCORE_RUNTIME
                 ref T r0 = ref array.DangerousGetReferenceAt(i, bounds.Left);
 #else
                 ref T r0 = ref array[i, bounds.Left];
@@ -243,7 +243,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<T> AsSpan<T>(this T[,] array)
         {
-#if NETCORE_RUNTIME || NETCOREAPP5_0
+#if NETCORE_RUNTIME
             var arrayData = Unsafe.As<RawArray2DData>(array);
 
             // On x64, the length is padded to x64, but it is represented in memory

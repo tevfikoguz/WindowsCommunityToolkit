@@ -5,7 +5,7 @@
 using System;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
-#if NETCORE_RUNTIME || NETCOREAPP5_0
+#if NETCORE_RUNTIME
 using System.Runtime.InteropServices;
 #endif
 using Microsoft.Toolkit.HighPerformance.Enumerables;
@@ -90,7 +90,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
 #endif
         }
 
-#if NETCORE_RUNTIME
+#if NETCORE_RUNTIME && !NETCOREAPP5_0
         // Description taken from CoreCLR: see https://source.dot.net/#System.Private.CoreLib/src/System/Runtime/CompilerServices/RuntimeHelpers.CoreCLR.cs,285.
         // CLR arrays are laid out in memory as follows (multidimensional array bounds are optional):
         // [ sync block || pMethodTable || num components || MD array bounds || array data .. ]

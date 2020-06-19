@@ -28,7 +28,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref char DangerousGetReference(this string text)
         {
-#if NETCOREAPP3_1 || NETCOREAPP5_0
+#if NETCORE3_1_OR_GREATER
             return ref Unsafe.AsRef(text.GetPinnableReference());
 #elif NETCOREAPP2_1
             var stringData = Unsafe.As<RawStringData>(text);
@@ -50,7 +50,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref char DangerousGetReferenceAt(this string text, int i)
         {
-#if NETCOREAPP3_1 || NETCOREAPP5_0
+#if NETCORE3_1_OR_GREATER
             ref char r0 = ref Unsafe.AsRef(text.GetPinnableReference());
 #elif NETCOREAPP2_1
             ref char r0 = ref Unsafe.As<RawStringData>(text).Data;

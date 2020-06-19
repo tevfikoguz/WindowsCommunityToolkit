@@ -75,11 +75,6 @@
     </When>
     <When Condition=" '$(TargetFramework)' == 'net5.0' ">
       <PropertyGroup>
-        <DefineConstants>NETSTANDARD2_1_OR_GREATER;SPAN_RUNTIME_SUPPORT</DefineConstants>
-      </PropertyGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-      <PropertyGroup>
 
         <!-- NETCORE_RUNTIME: to avoid issues with APIs that assume a specific memory layout, we define a
              .NET Core runtime constant to indicate the either .NET Core 2.1 or .NET Core 3.1. These are
@@ -88,7 +83,14 @@
              for .NET Standard targets do not make any assumtpion of any internals of the runtime being
              actually used by the consumers. .NET 5.0 would fall into this category as well, but we don't
              need to include that target as it offers APIs that don't require runtime-based workarounds.-->
-        <DefineConstants>NETSTANDARD2_1_OR_GREATER;SPAN_RUNTIME_SUPPORT;NETCORE_RUNTIME</DefineConstants>
+
+        <!-- NETCORE3_1_OR_GREATER: includes both .NET Core 3.1 and .NET 5 to simplify some checks.-->
+        <DefineConstants>NETSTANDARD2_1_OR_GREATER;NETCORE3_1_OR_GREATER;SPAN_RUNTIME_SUPPORT;NETCORE_RUNTIME</DefineConstants>
+      </PropertyGroup>
+    </When>
+    <When Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+      <PropertyGroup>
+        <DefineConstants>NETSTANDARD2_1_OR_GREATER;NETCORE3_1_OR_GREATER;SPAN_RUNTIME_SUPPORT;NETCORE_RUNTIME</DefineConstants>
       </PropertyGroup>
     </When>
     <When Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
