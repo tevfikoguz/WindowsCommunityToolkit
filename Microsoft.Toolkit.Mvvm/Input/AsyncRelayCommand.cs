@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 
@@ -20,7 +21,7 @@ namespace Microsoft.Toolkit.Mvvm.Input
         /// <summary>
         /// The <see cref="Func{TResult}"/> to invoke when <see cref="Execute"/> is used.
         /// </summary>
-        private readonly Func<Task> execute;
+        private readonly Func<CancellationToken, Task> execute;
 
         /// <summary>
         /// The optional action to invoke when <see cref="CanExecute"/> is used.
@@ -36,6 +37,15 @@ namespace Microsoft.Toolkit.Mvvm.Input
         /// <param name="execute">The execution logic.</param>
         public AsyncRelayCommand(Func<Task> execute)
         {
+            this.execute = _ => execute();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AsyncRelayCommand"/> class that can always execute.
+        /// </summary>
+        /// <param name="execute">The execution logic.</param>
+        public AsyncRelayCommand(Func<CancellationToken, Task> execute)
+        {
             this.execute = execute;
         }
 
@@ -46,9 +56,25 @@ namespace Microsoft.Toolkit.Mvvm.Input
         /// <param name="canExecute">The execution status logic.</param>
         public AsyncRelayCommand(Func<Task> execute, Func<bool> canExecute)
         {
+            this.execute = _ => execute();
+            this.canExecute = canExecute;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AsyncRelayCommand"/> class that can always execute.
+        /// </summary>
+        /// <param name="execute">The execution logic.</param>
+        /// <param name="canExecute">The execution status logic.</param>
+        public AsyncRelayCommand(Func<CancellationToken, Task> execute, Func<bool> canExecute)
+        {
             this.execute = execute;
             this.canExecute = canExecute;
         }
+
+        /// <summary>
+        /// The <see cref="CancellationTokenSource"/> instance to control <see cref="ExecutionTask"/>.
+        /// </summary>
+        private CancellationTokenSource? _tokenSource;
 
         private Task? executionTask;
 
@@ -83,10 +109,20 @@ namespace Microsoft.Toolkit.Mvvm.Input
         {
             if (CanExecute(parameter))
             {
-                return ExecutionTask = this.execute();
+                this._tokenSource?.Cancel();
+
+                CancellationTokenSource tokenSource = this._tokenSource = new CancellationTokenSource();
+
+                return ExecutionTask = this.execute(tokenSource.Token);
             }
 
             return Task.CompletedTask;
+        }
+
+        /// <inheritdoc/>
+        public void Cancel()
+        {
+            this._tokenSource?.Cancel();
         }
     }
 }

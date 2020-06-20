@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 
@@ -18,7 +19,7 @@ namespace Microsoft.Toolkit.Mvvm.Input
         /// <summary>
         /// The <see cref="Func{TResult}"/> to invoke when <see cref="Execute(T)"/> is used.
         /// </summary>
-        private readonly Func<T, Task> execute;
+        private readonly Func<T, CancellationToken, Task> execute;
 
         /// <summary>
         /// The optional action to invoke when <see cref="CanExecute(T)"/> is used.
@@ -35,6 +36,16 @@ namespace Microsoft.Toolkit.Mvvm.Input
         /// <remarks>See notes in <see cref="RelayCommand{T}(Action{T})"/>.</remarks>
         public AsyncRelayCommand(Func<T, Task> execute)
         {
+            this.execute = (value, _) => execute(value);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AsyncRelayCommand{T}"/> class that can always execute.
+        /// </summary>
+        /// <param name="execute">The execution logic.</param>
+        /// <remarks>See notes in <see cref="RelayCommand{T}(Action{T})"/>.</remarks>
+        public AsyncRelayCommand(Func<T, CancellationToken, Task> execute)
+        {
             this.execute = execute;
         }
 
@@ -46,9 +57,26 @@ namespace Microsoft.Toolkit.Mvvm.Input
         /// <remarks>See notes in <see cref="RelayCommand{T}(Action{T})"/>.</remarks>
         public AsyncRelayCommand(Func<T, Task> execute, Func<T, bool> canExecute)
         {
+            this.execute = (value, _) => execute(value);
+            this.canExecute = canExecute;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AsyncRelayCommand{T}"/> class that can always execute.
+        /// </summary>
+        /// <param name="execute">The execution logic.</param>
+        /// <param name="canExecute">The execution status logic.</param>
+        /// <remarks>See notes in <see cref="RelayCommand{T}(Action{T})"/>.</remarks>
+        public AsyncRelayCommand(Func<T, CancellationToken, Task> execute, Func<T, bool> canExecute)
+        {
             this.execute = execute;
             this.canExecute = canExecute;
         }
+
+        /// <summary>
+        /// The <see cref="CancellationTokenSource"/> instance to control <see cref="ExecutionTask"/>.
+        /// </summary>
+        private CancellationTokenSource? _tokenSource;
 
         private Task? executionTask;
 
@@ -104,7 +132,11 @@ namespace Microsoft.Toolkit.Mvvm.Input
         {
             if (CanExecute(parameter))
             {
-                return ExecutionTask = this.execute(parameter);
+                this._tokenSource?.Cancel();
+
+                CancellationTokenSource tokenSource = this._tokenSource = new CancellationTokenSource();
+
+                return ExecutionTask = this.execute(parameter, tokenSource.Token);
             }
 
             return Task.CompletedTask;
@@ -114,6 +146,12 @@ namespace Microsoft.Toolkit.Mvvm.Input
         public Task ExecuteAsync(object? parameter)
         {
             return ExecuteAsync((T)parameter!);
+        }
+
+        /// <inheritdoc/>
+        public void Cancel()
+        {
+            this._tokenSource?.Cancel();
         }
     }
 }

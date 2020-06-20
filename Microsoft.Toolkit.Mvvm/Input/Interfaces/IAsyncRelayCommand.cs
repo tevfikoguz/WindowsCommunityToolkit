@@ -25,5 +25,10 @@ namespace Microsoft.Toolkit.Mvvm.Input
         /// <param name="parameter">The input parameter.</param>
         /// <returns>The <see cref="Task"/> representing the async operation being executed.</returns>
         Task ExecuteAsync(object? parameter);
+
+        /// <summary>
+        /// Cancels the current <see cref="ExecutionTask"/>, if one if running.
+        /// </summary>
+        public void Cancel();
     }
 }
