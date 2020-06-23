@@ -43,7 +43,7 @@ namespace Microsoft.Toolkit.HighPerformance.Enumerables
         /// </summary>
         /// <returns>An <see cref="ReadOnlySpanEnumerable{T}"/> instance targeting the current <see cref="ReadOnlySpan{T}"/> value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpanEnumerable<T> GetEnumerator() => this;
+        public readonly ReadOnlySpanEnumerable<T> GetEnumerator() => this;
 
         /// <summary>
         /// Implements the duck-typed <see cref="System.Collections.IEnumerator.MoveNext"/> method.
@@ -67,7 +67,7 @@ namespace Microsoft.Toolkit.HighPerformance.Enumerables
         /// <summary>
         /// Gets the duck-typed <see cref="IEnumerator{T}.Current"/> property.
         /// </summary>
-        public Item Current
+        public readonly Item Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get

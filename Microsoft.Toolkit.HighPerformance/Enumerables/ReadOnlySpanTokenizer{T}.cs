@@ -42,6 +42,7 @@ namespace Microsoft.Toolkit.HighPerformance.Enumerables
         /// </summary>
         /// <param name="span">The source <see cref="ReadOnlySpan{T}"/> instance.</param>
         /// <param name="separator">The separator item to use.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpanTokenizer(ReadOnlySpan<T> span, T separator)
         {
             this.span = span;
@@ -55,7 +56,7 @@ namespace Microsoft.Toolkit.HighPerformance.Enumerables
         /// </summary>
         /// <returns>An <see cref="ReadOnlySpanTokenizer{T}"/> instance targeting the current <see cref="ReadOnlySpan{T}"/> value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpanTokenizer<T> GetEnumerator() => this;
+        public readonly ReadOnlySpanTokenizer<T> GetEnumerator() => this;
 
         /// <summary>
         /// Implements the duck-typed <see cref="System.Collections.IEnumerator.MoveNext"/> method.
@@ -94,7 +95,7 @@ namespace Microsoft.Toolkit.HighPerformance.Enumerables
         /// <summary>
         /// Gets the duck-typed <see cref="IEnumerator{T}.Current"/> property.
         /// </summary>
-        public ReadOnlySpan<T> Current
+        public readonly ReadOnlySpan<T> Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => this.span.Slice(this.start, this.end - this.start);
