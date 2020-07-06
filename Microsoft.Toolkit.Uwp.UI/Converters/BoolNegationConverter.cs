@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Diagnostics.Contracts;
 using Windows.UI.Xaml.Data;
 
 namespace Microsoft.Toolkit.Uwp.UI.Converters
@@ -13,29 +14,35 @@ namespace Microsoft.Toolkit.Uwp.UI.Converters
     public class BoolNegationConverter : IValueConverter
     {
         /// <summary>
-        /// Convert a boolean value to its negation.
+        /// Convert a <see cref="bool"/> value to its negation.
         /// </summary>
         /// <param name="value">The <see cref="bool"/> value to negate.</param>
-        /// <param name="targetType">The type of the target property, as a type reference.</param>
-        /// <param name="parameter">Optional parameter. Not used.</param>
-        /// <param name="language">The language of the conversion. Not used</param>
-        /// <returns>The value to be passed to the target dependency property.</returns>
-        public object Convert(object value, Type targetType, object parameter, string language)
+        /// <returns>The negation of <paramref name="value"/>.</returns>
+        [Pure]
+        public static bool Convert(bool value)
         {
-            return !(value is bool && (bool)value);
+            return !value;
         }
 
-        /// <summary>
-        /// Convert back a boolean value to its negation.
-        /// </summary>
-        /// <param name="value">The <see cref="bool"/> value to negate.</param>
-        /// <param name="targetType">The type of the target property, as a type reference.</param>
-        /// <param name="parameter">Optional parameter. Not used.</param>
-        /// <param name="language">The language of the conversion. Not used</param>
-        /// <returns>The value to be passed to the target dependency property.</returns>
+        /// <inheritdoc cref="Convert(bool)"/>.
+        [Pure]
+        public bool ConvertBack(bool value)
+        {
+            // Same as above in this case, but we need
+            // an instance method to enable x:Bind back.
+            return !value;
+        }
+
+        /// <inheritdoc/>
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            return Convert((value as bool?).GetValueOrDefault());
+        }
+
+        /// <inheritdoc/>
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            return !(value is bool && (bool)value);
+            return ConvertBack((value as bool?).GetValueOrDefault());
         }
     }
 }
