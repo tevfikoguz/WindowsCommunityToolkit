@@ -33,16 +33,26 @@ namespace Microsoft.Toolkit.Uwp.UI.Converters
             return !value;
         }
 
+        /// <summary>
+        /// The reusable boxed <see langword="true"/> value.
+        /// </summary>
+        private static readonly object True = true;
+
+        /// <summary>
+        /// The reusable boxed <see langword="false"/> value.
+        /// </summary>
+        private static readonly object False = false;
+
         /// <inheritdoc/>
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return Convert((value as bool?).GetValueOrDefault());
+            return (value as bool?).GetValueOrDefault() ? False : True;
         }
 
         /// <inheritdoc/>
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            return ConvertBack((value as bool?).GetValueOrDefault());
+            return (value as bool?).GetValueOrDefault() ? False : True;
         }
     }
 }
