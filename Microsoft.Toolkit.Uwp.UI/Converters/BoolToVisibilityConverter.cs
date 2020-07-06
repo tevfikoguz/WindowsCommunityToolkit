@@ -36,36 +36,16 @@ namespace Microsoft.Toolkit.Uwp.UI.Converters
             return value == Visibility.Visible;
         }
 
-        /// <summary>
-        /// The reusable boxed <see langword="true"/> value.
-        /// </summary>
-        private static readonly object True = true;
-
-        /// <summary>
-        /// The reusable boxed <see langword="false"/> value.
-        /// </summary>
-        private static readonly object False = false;
-
-        /// <summary>
-        /// The reusable boxed <see cref="Visibility.Visible"/> value.
-        /// </summary>
-        private static readonly object Visible = Visibility.Visible;
-
-        /// <summary>
-        /// The reusable boxed <see cref="Visibility.Collapsed"/> value.
-        /// </summary>
-        private static readonly object Collapsed = Visibility.Collapsed;
-
         /// <inheritdoc/>
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return (value as bool?).GetValueOrDefault() ? Visible : Collapsed;
+            return (value as bool?).GetValueOrDefault() ? ConverterTools.Visible : ConverterTools.Collapsed;
         }
 
         /// <inheritdoc/>
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            return (value as Visibility?).GetValueOrDefault() == Visibility.Visible ? True : False;
+            return (value as Visibility?).GetValueOrDefault() == Visibility.Visible ? ConverterTools.True : ConverterTools.False;
         }
     }
 }
