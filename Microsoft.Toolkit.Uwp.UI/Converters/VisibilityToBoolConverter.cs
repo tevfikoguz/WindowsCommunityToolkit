@@ -39,13 +39,13 @@ namespace Microsoft.Toolkit.Uwp.UI.Converters
         /// <inheritdoc/>
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return Convert((value as Visibility?).GetValueOrDefault());
+            return (value as Visibility?).GetValueOrDefault() == Visibility.Visible ? ConverterTools.True : ConverterTools.False;
         }
 
         /// <inheritdoc/>
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            return ConvertBack((value as bool?).GetValueOrDefault());
+            return (value as bool?).GetValueOrDefault() ? ConverterTools.Visible : ConverterTools.Collapsed;
         }
     }
 }
