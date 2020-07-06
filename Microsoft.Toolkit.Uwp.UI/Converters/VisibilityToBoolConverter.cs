@@ -3,40 +3,49 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Diagnostics.Contracts;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
 namespace Microsoft.Toolkit.Uwp.UI.Converters
 {
     /// <summary>
-    /// This class converts a Visibility enumeration to a boolean value.
+    /// This class converts <see cref="Visibility"/> values into <see cref="bool"/> values.
     /// </summary>
     public class VisibilityToBoolConverter : IValueConverter
     {
         /// <summary>
-        /// Convert a <see cref="Visibility"/> value to boolean.
+        /// Convert a <see cref="Visibility"/> value to a <see cref="bool"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Visibility"/> value to convert.</param>
-        /// <param name="targetType">The type of the target property, as a type reference.</param>
-        /// <param name="parameter">Optional parameter. Not used.</param>
-        /// <param name="language">The language of the conversion. Not used</param>
-        /// <returns>The value to be passed to the target dependency property.</returns>
-        public object Convert(object value, Type targetType, object parameter, string language)
+        /// <returns>The <see cref="bool"/> value for <paramref name="value"/>.</returns>
+        [Pure]
+        public static bool Convert(Visibility value)
         {
-            return value is Visibility visibility && visibility == Visibility.Visible;
+            return value == Visibility.Visible;
         }
 
         /// <summary>
-        /// Convert back a boolean value to <see cref="Visibility"/>.
+        /// Convert a <see cref="bool"/> value to a <see cref="Visibility"/> value.
         /// </summary>
-        /// <param name="value">The <see cref="Visibility"/> value to convert back.</param>
-        /// <param name="targetType">The type of the target property, as a type reference.</param>
-        /// <param name="parameter">Optional parameter. Not used.</param>
-        /// <param name="language">The language of the conversion. Not used</param>
-        /// <returns>The value to be passed to the target dependency property.</returns>
+        /// <param name="value">The <see cref="bool"/> value to convert.</param>
+        /// <returns>The <see cref="Visibility"/> value for <paramref name="value"/>.</returns>
+        [Pure]
+        public Visibility ConvertBack(bool value)
+        {
+            return value ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        /// <inheritdoc/>
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            return Convert((value as Visibility?).GetValueOrDefault());
+        }
+
+        /// <inheritdoc/>
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            return (value is bool bl && bl) ? Visibility.Visible : Visibility.Collapsed;
+            return ConvertBack((value as bool?).GetValueOrDefault());
         }
     }
 }

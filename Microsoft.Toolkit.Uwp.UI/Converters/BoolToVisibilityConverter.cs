@@ -10,7 +10,7 @@ using Windows.UI.Xaml.Data;
 namespace Microsoft.Toolkit.Uwp.UI.Converters
 {
     /// <summary>
-    /// This class converts a boolean value into a Visibility enumeration.
+    /// This class converts <see cref="bool"/> values into <see cref="Visibility"/> values.
     /// </summary>
     public class BoolToVisibilityConverter : IValueConverter
     {
