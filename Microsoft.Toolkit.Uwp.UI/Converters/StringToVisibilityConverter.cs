@@ -12,7 +12,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Converters
     /// <summary>
     /// This class converts a string value into a Visibility value (if the value is null or empty returns a collapsed value).
     /// </summary>
-    public class StringVisibilityConverter : IValueConverter
+    public class StringToVisibilityConverter : IValueConverter
     {
         /// <summary>
         /// Convert a <see cref="bool"/> value to its negation.
