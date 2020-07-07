@@ -23,13 +23,13 @@ namespace Microsoft.Toolkit.Uwp.UI.Converters
         [Pure]
         public static Visibility Convert(IEnumerable value)
         {
-            return CollectionToVisibilityConverter.Any(value) ? Visibility.Collapsed : Visibility.Visible;
+            return ConverterTools.Any(value) ? Visibility.Collapsed : Visibility.Visible;
         }
 
         /// <inheritdoc/>
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return CollectionToVisibilityConverter.Any(value as IEnumerable) ? ConverterTools.Collapsed : ConverterTools.Visible;
+            return ConverterTools.Any(value as IEnumerable) ? ConverterTools.Collapsed : ConverterTools.Visible;
         }
 
         /// <inheritdoc/>

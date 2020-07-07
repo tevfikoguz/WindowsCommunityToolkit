@@ -60,7 +60,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Converters
         [Pure]
         public object Convert(IEnumerable source)
         {
-            return CollectionToVisibilityConverter.Any(source) ? NotEmptyValue : EmptyValue;
+            return ConverterTools.Any(source) ? NotEmptyValue : EmptyValue;
         }
 
         /// <inheritdoc/>
