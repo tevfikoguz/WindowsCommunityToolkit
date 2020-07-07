@@ -45,7 +45,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Converters
         /// <param name="source">The input source to inspect.</param>
         /// <returns>Whether or not <paramref name="source"/> has at least one item.</returns>
         [Pure]
-        private static bool Any(IEnumerable source)
+        internal static bool Any(IEnumerable source)
         {
             if (source is null)
             {
