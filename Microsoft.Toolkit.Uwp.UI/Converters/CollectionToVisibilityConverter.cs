@@ -14,7 +14,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Converters
     /// <summary>
     /// This class converts a collection size to visibility.
     /// </summary>
-    public class CollectionVisibilityConverter : IValueConverter
+    public class CollectionToVisibilityConverter : IValueConverter
     {
         /// <summary>
         /// Convert a <see cref="bool"/> value to its negation.
