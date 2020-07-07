@@ -55,32 +55,23 @@ namespace Microsoft.Toolkit.Uwp.UI.Converters
         /// Convert a boolean value to an other object.
         /// </summary>
         /// <param name="value">The input <see cref="bool"/> value.</param>
-        /// <param name="invert">Whether or not to invert <paramref name="value"/>.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
         [Pure]
-        public object Convert(bool value, bool invert)
+        public object Convert(bool value)
         {
-            return (value && !invert) || (!value && invert)
-                ? TrueValue
-                : FalseValue;
+            return value ? TrueValue : FalseValue;
         }
 
         /// <summary>
         /// Convert back the value to a boolean.
         /// </summary>
         /// <param name="value">The input <see cref="bool"/> value.</param>
-        /// <param name="invert">Whether or not to invert <paramref name="value"/>.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
         /// <remarks>If the <paramref name="value"/> parameter is a reference type, <see cref="TrueValue"/> must match its reference to return true.</remarks>
         [Pure]
-        public bool ConvertBack(object value, bool invert)
+        public bool ConvertBack(object value)
         {
             bool result = ReferenceEquals(value, TrueValue);
-
-            if (invert)
-            {
-                result = !result;
-            }
 
             return result;
         }
@@ -88,15 +79,13 @@ namespace Microsoft.Toolkit.Uwp.UI.Converters
         /// <inheritdoc/>
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return Convert(
-                (value as bool?).GetValueOrDefault(),
-                ConverterTools.TryParseBool(parameter));
+            return Convert((value as bool?).GetValueOrDefault());
         }
 
         /// <inheritdoc/>
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            return ConvertBack(value, ConverterTools.TryParseBool(parameter));
+            return ConvertBack(value);
         }
     }
 }
