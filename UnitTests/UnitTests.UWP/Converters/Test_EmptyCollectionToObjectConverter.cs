@@ -24,7 +24,7 @@ namespace UnitTests.Converters
         [UITestMethod]
         public void Test_ConvertNullCollectionToVisibility()
         {
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = Visibility.Visible,
                 EmptyValue = Visibility.Collapsed
@@ -37,7 +37,7 @@ namespace UnitTests.Converters
         [UITestMethod]
         public void Test_ConvertNotEmptyCollectionToVisibility()
         {
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = Visibility.Visible,
                 EmptyValue = Visibility.Collapsed
@@ -50,7 +50,7 @@ namespace UnitTests.Converters
         [UITestMethod]
         public void Test_ConvertEmptyCollectionToVisibility()
         {
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = Visibility.Visible,
                 EmptyValue = Visibility.Collapsed
@@ -63,7 +63,7 @@ namespace UnitTests.Converters
         [UITestMethod]
         public void Test_ConvertNotEmptyCollectionToVisibilityWithNegateTrue()
         {
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = Visibility.Visible,
                 EmptyValue = Visibility.Collapsed
@@ -76,7 +76,7 @@ namespace UnitTests.Converters
         [UITestMethod]
         public void Test_ConvertEmptyCollectionToVisibilityWithNegateTrue()
         {
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = Visibility.Visible,
                 EmptyValue = Visibility.Collapsed
@@ -89,7 +89,7 @@ namespace UnitTests.Converters
         [UITestMethod]
         public void Test_ConvertNotEmptyCollectionToVisibilityWithNegateFalse()
         {
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = Visibility.Visible,
                 EmptyValue = Visibility.Collapsed
@@ -102,7 +102,7 @@ namespace UnitTests.Converters
         [UITestMethod]
         public void Test_ConvertEmptyCollectionToVisibilityWithNegateFalse()
         {
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = Visibility.Visible,
                 EmptyValue = Visibility.Collapsed
@@ -115,7 +115,7 @@ namespace UnitTests.Converters
         [UITestMethod]
         public void Test_ConvertNotEmptyCollectionToVisibilityWithInvalidNegate()
         {
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = Visibility.Visible,
                 EmptyValue = Visibility.Collapsed
@@ -128,7 +128,7 @@ namespace UnitTests.Converters
         [UITestMethod]
         public void Test_ConvertEmptyCollectionToVisibilityWithInvalidNegate()
         {
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = Visibility.Visible,
                 EmptyValue = Visibility.Collapsed
@@ -143,7 +143,7 @@ namespace UnitTests.Converters
         {
             var greenBrush = new SolidColorBrush(Colors.Green);
             var redBrush = new SolidColorBrush(Colors.Red);
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = greenBrush,
                 EmptyValue = redBrush
@@ -158,7 +158,7 @@ namespace UnitTests.Converters
         {
             var greenBrush = new SolidColorBrush(Colors.Green);
             var redBrush = new SolidColorBrush(Colors.Red);
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = greenBrush,
                 EmptyValue = redBrush
@@ -171,7 +171,7 @@ namespace UnitTests.Converters
         [UITestMethod]
         public void Test_ConvertNotEmptyCollectionToBitmapImageWithTypeConversion()
         {
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = "ms-appx:///Assets/NotEmptyCollection.png",
                 EmptyValue = "ms-appx:///Assets/EmptyCollection.png"
@@ -186,7 +186,7 @@ namespace UnitTests.Converters
         [UITestMethod]
         public void Test_ConvertNotEmptyCollectionToBrushWithTypeConversion()
         {
-            var converter = new EmptyCollectionToObjectConverter
+            var converter = new CollectionToObjectConverter
             {
                 NotEmptyValue = "Green",
                 EmptyValue = "Red"
