@@ -221,7 +221,7 @@ namespace UnitTests.Mvvm
 
         public class SampleModelWithTask<T> : ObservableObject
         {
-            private readonly FieldAccessor<Task<T>> data = new FieldAccessor<Task<T>>();
+            private readonly TaskAccessor<Task<T>> data = new TaskAccessor<Task<T>>();
 
             public Task<T> Data
             {

@@ -317,7 +317,7 @@ namespace Microsoft.Toolkit.Mvvm.ComponentModel
         /// </code>
         /// </summary>
         /// <typeparam name="TTask">The type of <see cref="Task"/> to set and monitor.</typeparam>
-        /// <param name="fieldAccessor">The <see cref="FieldAccessor{T}"/> instance to access the backing field for the property.</param>
+        /// <param name="fieldAccessor">The <see cref="TaskAccessor{T}"/> instance to access the backing field for the property.</param>
         /// <param name="newValue">The property's value after the change occurred.</param>
         /// <param name="propertyName">(optional) The name of the property that changed.</param>
         /// <returns><see langword="true"/> if the property was changed, <see langword="false"/> otherwise.</returns>
@@ -327,7 +327,7 @@ namespace Microsoft.Toolkit.Mvvm.ComponentModel
         /// new value being assigned to field provided by <paramref name="fieldAccessor"/> is different than the previous one,
         /// and it does not mean the new <typeparamref name="TTask"/> instance passed as argument is in any particular state.
         /// </remarks>
-        protected bool SetPropertyAndNotifyOnCompletion<TTask>(FieldAccessor<TTask?> fieldAccessor, TTask? newValue, [CallerMemberName] string? propertyName = null)
+        protected bool SetPropertyAndNotifyOnCompletion<TTask>(TaskAccessor<TTask> fieldAccessor, TTask? newValue, [CallerMemberName] string? propertyName = null)
             where TTask : Task
         {
             // We invoke the overload with a callback here to avoid code duplication, and simply pass an empty callback.
@@ -343,12 +343,12 @@ namespace Microsoft.Toolkit.Mvvm.ComponentModel
         /// Compares the current and new values for a given field (which should be the backing
         /// field for a property). If the value has changed, raises the <see cref="PropertyChanging"/>
         /// event, updates the field and then raises the <see cref="PropertyChanged"/> event.
-        /// This method is just like <see cref="SetPropertyAndNotifyOnCompletion{TTask}(FieldAccessor{TTask},TTask,string)"/>,
+        /// This method is just like <see cref="SetPropertyAndNotifyOnCompletion{TTask}(TaskAccessor{TTask},TTask,string)"/>,
         /// with the difference being an extra <see cref="Action{T}"/> parameter with a callback being invoked
         /// either immediately, if the new task has already completed or is <see langword="null"/>, or upon completion.
         /// </summary>
         /// <typeparam name="TTask">The type of <see cref="Task"/> to set and monitor.</typeparam>
-        /// <param name="fieldAccessor">The <see cref="FieldAccessor{T}"/> instance to access the backing field for the property.</param>
+        /// <param name="fieldAccessor">The <see cref="TaskAccessor{T}"/> instance to access the backing field for the property.</param>
         /// <param name="newValue">The property's value after the change occurred.</param>
         /// <param name="callback">A callback to invoke to update the property value.</param>
         /// <param name="propertyName">(optional) The name of the property that changed.</param>
@@ -357,7 +357,7 @@ namespace Microsoft.Toolkit.Mvvm.ComponentModel
         /// The <see cref="PropertyChanging"/> and <see cref="PropertyChanged"/> events are not raised
         /// if the current and new value for the target property are the same.
         /// </remarks>
-        protected bool SetPropertyAndNotifyOnCompletion<TTask>(FieldAccessor<TTask?> fieldAccessor, TTask? newValue, Action<TTask?> callback, [CallerMemberName] string? propertyName = null)
+        protected bool SetPropertyAndNotifyOnCompletion<TTask>(TaskAccessor<TTask> fieldAccessor, TTask? newValue, Action<TTask?> callback, [CallerMemberName] string? propertyName = null)
             where TTask : Task
         {
             if (ReferenceEquals(fieldAccessor.Value, newValue))
@@ -424,15 +424,16 @@ namespace Microsoft.Toolkit.Mvvm.ComponentModel
         }
 
         /// <summary>
-        /// A wrapping class that can hold a value.
+        /// A wrapping class that can hold a <see cref="Task"/> value.
         /// </summary>
-        /// <typeparam name="T">The type of value to store.</typeparam>
-        protected sealed class FieldAccessor<T>
+        /// <typeparam name="TTask">The type of value to store.</typeparam>
+        protected sealed class TaskAccessor<TTask>
+            where TTask : Task
         {
             /// <summary>
-            /// Gets or sets the wrapped value.
+            /// Gets or sets the wrapped <see cref="Task"/> value.
             /// </summary>
-            public T Value { get; set; }
+            public TTask? Value { get; set; }
         }
 
         /// <summary>

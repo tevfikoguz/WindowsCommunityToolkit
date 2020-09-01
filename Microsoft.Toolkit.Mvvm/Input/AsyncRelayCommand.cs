@@ -83,7 +83,7 @@ namespace Microsoft.Toolkit.Mvvm.Input
             this.canExecute = canExecute;
         }
 
-        private readonly FieldAccessor<Task?> executionTask = new FieldAccessor<Task?>();
+        private readonly TaskAccessor<Task> executionTask = new TaskAccessor<Task>();
 
         /// <inheritdoc/>
         public Task? ExecutionTask
