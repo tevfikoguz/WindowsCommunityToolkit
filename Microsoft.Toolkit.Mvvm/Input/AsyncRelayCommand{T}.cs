@@ -83,15 +83,15 @@ namespace Microsoft.Toolkit.Mvvm.Input
             this.canExecute = canExecute;
         }
 
-        private Task? executionTask;
+        private readonly FieldAccessor<Task?> executionTask = new FieldAccessor<Task?>();
 
         /// <inheritdoc/>
         public Task? ExecutionTask
         {
-            get => this.executionTask;
+            get => this.executionTask.Value;
             private set
             {
-                if (SetPropertyAndNotifyOnCompletion(ref this.executionTask, () => this.executionTask, value, _ => OnPropertyChanged(nameof(IsRunning))))
+                if (SetPropertyAndNotifyOnCompletion(this.executionTask, value, _ => OnPropertyChanged(nameof(IsRunning))))
                 {
                     OnPropertyChanged(nameof(IsRunning));
                 }
