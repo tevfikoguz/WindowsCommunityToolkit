@@ -305,6 +305,87 @@ namespace Microsoft.Toolkit.HighPerformance.Memory
         /// <summary>
         /// Initializes a new instance of the <see cref="Memory2D{T}"/> struct.
         /// </summary>
+        /// <param name="memoryManager">The target <see cref="MemoryManager{T}"/> to wrap.</param>
+        /// <param name="height">The height of the resulting 2D area.</param>
+        /// <param name="width">The width of each row in the resulting 2D area.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when either <paramref name="height"/> or <paramref name="width"/> are invalid.
+        /// </exception>
+        /// <remarks>The total area must match the lenght of <paramref name="memoryManager"/>.</remarks>
+        public Memory2D(MemoryManager<T> memoryManager, int height, int width)
+            : this(memoryManager, 0, height, width, 0)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Memory2D{T}"/> struct.
+        /// </summary>
+        /// <param name="memoryManager">The target <see cref="MemoryManager{T}"/> to wrap.</param>
+        /// <param name="offset">The initial offset within <paramref name="memoryManager"/>.</param>
+        /// <param name="height">The height of the resulting 2D area.</param>
+        /// <param name="width">The width of each row in the resulting 2D area.</param>
+        /// <param name="pitch">The pitch in the resulting 2D area.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when one of the input parameters is out of range.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the requested area is outside of bounds for <paramref name="memoryManager"/>.
+        /// </exception>
+        public Memory2D(MemoryManager<T> memoryManager, int offset, int height, int width, int pitch)
+        {
+            int length = memoryManager.GetSpan().Length;
+
+            if ((uint)offset > (uint)length)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeExceptionForOffset();
+            }
+
+            if (height < 0)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeExceptionForHeight();
+            }
+
+            if (width < 0)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeExceptionForWidth();
+            }
+
+            if (pitch < 0)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeExceptionForPitch();
+            }
+
+            if (width == 0 || height == 0)
+            {
+                this = default;
+
+                return;
+            }
+
+            int
+                remaining = length - offset,
+                area = ((width + pitch) * (height - 1)) + width;
+
+            if (area > remaining)
+            {
+                ThrowHelper.ThrowArgumentException();
+            }
+
+            this.instance = memoryManager;
+
+            unsafe
+            {
+                this.offset = (IntPtr)(void*)(uint)offset;
+            }
+
+            this.height = height;
+            this.width = width;
+            this.pitch = pitch;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Memory2D{T}"/> struct.
+        /// </summary>
         /// <param name="memory">The target <see cref="Memory{T}"/> to wrap.</param>
         /// <param name="height">The height of the resulting 2D area.</param>
         /// <param name="width">The width of each row in the resulting 2D area.</param>
@@ -312,7 +393,7 @@ namespace Microsoft.Toolkit.HighPerformance.Memory
         /// Thrown when either <paramref name="height"/> or <paramref name="width"/> are invalid.
         /// </exception>
         /// <remarks>The total area must match the lenght of <paramref name="memory"/>.</remarks>
-        public Memory2D(Memory<T> memory, int height, int width)
+        internal Memory2D(Memory<T> memory, int height, int width)
             : this(memory, 0, height, width, 0)
         {
         }
@@ -331,7 +412,7 @@ namespace Microsoft.Toolkit.HighPerformance.Memory
         /// <exception cref="ArgumentException">
         /// Thrown when the requested area is outside of bounds for <paramref name="memory"/>.
         /// </exception>
-        public Memory2D(Memory<T> memory, int offset, int height, int width, int pitch)
+        internal Memory2D(Memory<T> memory, int offset, int height, int width, int pitch)
         {
             if ((uint)offset > (uint)memory.Length)
             {
@@ -373,9 +454,9 @@ namespace Microsoft.Toolkit.HighPerformance.Memory
             // consumers do an unsafe cast for the entire Memory<T> object, and while not
             // really safe it is still supported in CoreCLR too, so we're following suit here.
             if (typeof(T) == typeof(char) &&
-                MemoryMarshal.TryGetString(Unsafe.As<Memory<T>, Memory<char>>(ref memory), out string? text, out int start, out _))
+                MemoryMarshal.TryGetString(Unsafe.As<Memory<T>, Memory<char>>(ref memory), out string? text, out int textStart, out _))
             {
-                ref char r0 = ref text.DangerousGetReferenceAt(start + offset);
+                ref char r0 = ref text.DangerousGetReferenceAt(textStart + offset);
 
                 this.instance = text;
                 this.offset = text.DangerousGetObjectDataByteOffset(ref r0);
@@ -390,11 +471,22 @@ namespace Microsoft.Toolkit.HighPerformance.Memory
                 T[] array = segment.Array!;
 
                 this.instance = array;
-                this.offset = array.DangerousGetObjectDataByteOffset(ref array.DangerousGetReferenceAt(offset)) + segment.Offset;
+                this.offset = array.DangerousGetObjectDataByteOffset(ref array.DangerousGetReferenceAt(segment.Offset + offset));
+            }
+            else if (MemoryMarshal.TryGetMemoryManager<T, MemoryManager<T>>(memory, out var memoryManager, out int memoryManagerStart, out _))
+            {
+                this.instance = memoryManager;
+
+                unsafe
+                {
+                    this.offset = (IntPtr)(void*)(uint)(memoryManagerStart + offset);
+                }
             }
             else
             {
-                this.instance = memory.Slice(offset);
+                ThrowHelper.ThrowArgumentExceptionForUnsupportedType();
+
+                this.instance = null;
                 this.offset = default;
             }
 
@@ -432,25 +524,12 @@ namespace Microsoft.Toolkit.HighPerformance.Memory
         /// <param name="pitch">The pitch of the 2D memory area to map.</param>
         /// <returns>A <see cref="Memory2D{T}"/> instance with the specified parameters.</returns>
         /// <remarks>The <paramref name="value"/> parameter is not validated, and it's responsability of the caller to ensure it's valid.</remarks>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="instance"/> is of an unsupported type.
-        /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// Thrown when one of the input parameters is out of range.
         /// </exception>
         [Pure]
         public static Memory2D<T> DangerousCreate(object instance, ref T value, int height, int width, int pitch)
         {
-            if (instance.GetType() == typeof(Memory<T>))
-            {
-                ThrowHelper.ThrowArgumentExceptionForUnsupportedType();
-            }
-
-            if (instance.GetType() == typeof(ReadOnlyMemory<T>))
-            {
-                ThrowHelper.ThrowArgumentExceptionForUnsupportedType();
-            }
-
             if (height < 0)
             {
                 ThrowHelper.ThrowArgumentOutOfRangeExceptionForHeight();
@@ -523,14 +602,12 @@ namespace Microsoft.Toolkit.HighPerformance.Memory
                 if (!(this.instance is null))
                 {
 #if SPAN_RUNTIME_SUPPORT
-                    if (this.instance.GetType() == typeof(Memory<T>))
+                    if (this.instance is MemoryManager<T> memoryManager)
                     {
-                        Memory<T> memory = (Memory<T>)this.instance;
+                        ref T r0 = ref memoryManager.GetSpan().DangerousGetReference();
+                        ref T r1 = ref Unsafe.Add(ref r0, this.offset);
 
-                        // If the wrapped object is a Memory<T>, it is always pre-offset
-                        ref T r0 = ref memory.Span.DangerousGetReference();
-
-                        return new Span2D<T>(ref r0, this.height, this.width, this.pitch);
+                        return new Span2D<T>(ref r1, this.height, this.width, this.pitch);
                     }
                     else
                     {
@@ -588,14 +665,6 @@ namespace Microsoft.Toolkit.HighPerformance.Memory
 
             IntPtr offset = this.offset + (shift * Unsafe.SizeOf<T>());
 
-            if (this.instance is Memory<T> memory)
-            {
-                // Memory<T> instance are always already sliced
-                object instance = memory.Slice((int)offset);
-
-                return new Memory2D<T>(instance, default, height, width, pitch);
-            }
-
             return new Memory2D<T>(this.instance!, offset, height, width, pitch);
         }
 
@@ -646,9 +715,9 @@ namespace Microsoft.Toolkit.HighPerformance.Memory
         {
             if (!(this.instance is null))
             {
-                if (this.instance is Memory<T> memory)
+                if (this.instance is MemoryManager<T> memoryManager)
                 {
-                    return memory.Pin();
+                    return memoryManager.Pin();
                 }
 
                 GCHandle handle = GCHandle.Alloc(this.instance, GCHandleType.Pinned);
@@ -678,7 +747,7 @@ namespace Microsoft.Toolkit.HighPerformance.Memory
                 else if (typeof(T) == typeof(char) && this.instance.GetType() == typeof(string))
                 {
                     string text = Unsafe.As<string>(this.instance);
-                    int index = text.AsSpan().IndexOf(text.DangerousGetObjectDataReferenceAt<char>(this.offset));
+                    int index = text.AsSpan().IndexOf(in text.DangerousGetObjectDataReferenceAt<char>(this.offset));
                     ReadOnlyMemory<char> temp = text.AsMemory(index, Size);
 
                     // The string type could still be present if a user ends up creating a
@@ -689,10 +758,13 @@ namespace Microsoft.Toolkit.HighPerformance.Memory
                     // to make sure not to ever actually write to the resulting Memory<T>.
                     memory = MemoryMarshal.AsMemory<T>(Unsafe.As<ReadOnlyMemory<char>, Memory<T>>(ref temp));
                 }
-                else if (this.instance.GetType() == typeof(Memory<T>))
+                else if (this.instance is MemoryManager<T> memoryManager)
                 {
-                    // If the object is a Memory<T>, just slice it as needed
-                    memory = ((Memory<T>)this.instance).Slice(0, this.height * this.width);
+                    unsafe
+                    {
+                        // If the object is a MemoryManager<T>, just slice it as needed
+                        memory = memoryManager.Memory.Slice((int)(void*)this.offset, this.height * this.width);
+                    }
                 }
                 else if (this.instance.GetType() == typeof(T[]))
                 {
