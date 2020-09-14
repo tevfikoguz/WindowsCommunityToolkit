@@ -473,7 +473,7 @@ namespace Microsoft.Toolkit.Uwp.SampleApp
 
                         if (existingOption == null && string.IsNullOrWhiteSpace(type))
                         {
-                            throw new NotSupportedException($"Unrecognized short identifier '{name}'; Define type and parameters of property in first occurence in {XamlCodeFile}.");
+                            throw new NotSupportedException($"Unrecognized short identifier '{name}'; Define type and parameters of property in first occurrence in {XamlCodeFile}.");
                         }
 
                         if (Enum.TryParse(type, out PropertyKind kind))
@@ -718,6 +718,18 @@ namespace Microsoft.Toolkit.Uwp.SampleApp
             // Search in Microsoft.Toolkit.Uwp.UI.Controls.DataGrid
             var dataGridProxyType = DataGridGridLinesVisibility.None;
             assembly = dataGridProxyType.GetType().GetTypeInfo().Assembly;
+
+            foreach (var typeInfo in assembly.ExportedTypes)
+            {
+                if (typeInfo.Name == typeName)
+                {
+                    return typeInfo;
+                }
+            }
+
+            // Search in Microsoft.Toolkit.Uwp.UI.Controls.Markdown
+            var markdownTextBlockType = typeof(MarkdownTextBlock);
+            assembly = markdownTextBlockType.GetTypeInfo().Assembly;
 
             foreach (var typeInfo in assembly.ExportedTypes)
             {

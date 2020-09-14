@@ -95,15 +95,6 @@ namespace Microsoft.Toolkit.Services.LinkedIn
         /// <summary>
         /// Log user out of LinkedIn.
         /// </summary>
-        [Obsolete("Logout is deprecated, please use LogoutAsync instead.", true)]
-        public void Logout()
-        {
-            Provider.Logout();
-        }
-
-        /// <summary>
-        /// Log user out of LinkedIn.
-        /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public Task LogoutAsync()
         {
@@ -113,7 +104,7 @@ namespace Microsoft.Toolkit.Services.LinkedIn
 
 #if WINRT
         /// <summary>
-        /// Initialize underlying provider with relevent token information for Uwp.
+        /// Initialize underlying provider with relevant token information for UWP.
         /// </summary>
         /// <param name="oAuthTokens">Token instance.</param>
         /// <param name="requiredPermissions">Scope / permissions app requires user to sign up for.</param>
@@ -124,7 +115,7 @@ namespace Microsoft.Toolkit.Services.LinkedIn
         }
 
         /// <summary>
-        /// Initialize underlying provider with relevent token information.
+        /// Initialize underlying provider with relevant token information.
         /// </summary>
         /// <param name="clientId">Client Id.</param>
         /// <param name="clientSecret">Client secret.</param>
@@ -138,7 +129,7 @@ namespace Microsoft.Toolkit.Services.LinkedIn
 
 #if NET462
         /// <summary>
-        /// Initialize underlying provider with relevant token information for Uwp.
+        /// Initialize underlying provider with relevant token information for UWP.
         /// </summary>
         /// <param name="oAuthTokens">Token instance.</param>
         /// <param name="requiredPermissions">Scope / permissions app requires user to sign up for.</param>
