@@ -331,8 +331,8 @@ namespace Microsoft.Toolkit.Mvvm.Messaging
         {
             object[] handlers;
             object[] recipients;
-            ref object handlersRef = ref Unsafe.AsRef<object>(null);
-            ref object recipientsRef = ref Unsafe.AsRef<object>(null);
+            ref object handlersRef = ref Unsafe.NullRef<object>();
+            ref object recipientsRef = ref Unsafe.NullRef<object>();
             int i = 0;
 
             lock (this.recipientsMap)
