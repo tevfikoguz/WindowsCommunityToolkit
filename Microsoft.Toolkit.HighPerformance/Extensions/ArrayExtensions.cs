@@ -44,10 +44,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
                 return ref array[0];
             }
 
-            unsafe
-            {
-                return ref Unsafe.AsRef<T>(null);
-            }
+            return ref Unsafe.NullRef<T>();
 #pragma warning restore SA1131
 #endif
         }
@@ -76,10 +73,7 @@ namespace Microsoft.Toolkit.HighPerformance.Extensions
                 return ref array[i];
             }
 
-            unsafe
-            {
-                return ref Unsafe.AsRef<T>(null);
-            }
+            return ref Unsafe.NullRef<T>();
 #endif
         }
 
